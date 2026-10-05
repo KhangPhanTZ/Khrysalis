@@ -1,0 +1,41 @@
+name: Daily report
+
+on:
+  schedule:
+    # 12:30 UTC thứ 2–6 = trước giờ mở cửa NYSE (8:30 ET mùa hè / 7:30 ET mùa đông)
+    - cron: "30 12 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.11
+      - run: uv sync --extra agents --frozen
+
+      # Giữ cache giá DuckDB + LLM giữa các lần chạy để không tải lại từ đầu
+      - uses: actions/cache@v4
+        with:
+          path: data
+          key: moneyflow-data-${{ github.run_id }}
+          restore-keys: moneyflow-data-
+
+      - name: Run pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MONEYFLOW_DB_PATH: data/moneyflow.duckdb
+        run: uv run moneyflow -v run --date today --telegram
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: report-${{ github.run_id }}
+          path: reports_out/*.md

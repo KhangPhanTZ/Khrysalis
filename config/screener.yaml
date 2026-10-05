@@ -1,0 +1,25 @@
+# Số ngày lịch sử cần tải để tính chỉ báo
+lookback_days: 260
+
+# Lọc thanh khoản: bỏ mã có dollar volume trung bình 20 phiên thấp hơn ngưỡng (USD)
+min_avg_dollar_volume: 50_000_000
+
+# Số mã đưa vào báo cáo
+top_n: 15
+
+windows:
+  avg_volume: 20     # RVOL = volume hôm nay / trung bình N phiên trước
+  rvol_smooth: 5     # trung bình RVOL N phiên gần nhất
+  cmf: 20
+  mfi: 14
+  rs_short: 20
+  rs_long: 60
+
+# Trọng số điểm dòng tiền (tổng = 1). Mỗi thành phần được xếp hạng percentile 0–100
+weights:
+  dollar_volume: 0.15
+  rvol: 0.25
+  cmf: 0.20
+  mfi: 0.10
+  rs_short: 0.20
+  rs_long: 0.10

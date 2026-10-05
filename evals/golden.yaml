@@ -1,0 +1,7 @@
+# Cặp (ngày, mã) mẫu. Bổ sung dần tới 20–30 cặp, đa dạng ngành và trạng thái thị trường.
+cases:
+  - { date: 2026-09-15, ticker: PLTR }
+  - { date: 2026-09-15, ticker: NVDA }
+  - { date: 2026-09-15, ticker: COIN }
+  - { date: 2026-08-20, ticker: HOOD }
+  - { date: 2026-08-20, ticker: AMD }
