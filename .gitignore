@@ -15,7 +15,7 @@ htmlcov/
 .env
 
 # Data cache & output
-data/
+/data/
 *.duckdb
 *.duckdb.wal
 reports_out/
