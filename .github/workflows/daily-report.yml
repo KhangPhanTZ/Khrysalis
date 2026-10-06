@@ -25,15 +25,20 @@ jobs:
           key: moneyflow-data-${{ github.run_id }}
           restore-keys: moneyflow-data-
 
+      # Đọc từ Secrets (khuyên dùng cho key/token); nếu trống thì lấy từ Variables
       - name: Run pipeline
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
-          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || vars.ANTHROPIC_API_KEY }}
+          FINNHUB_KEY: ${{ secrets.FINNHUB_KEY || vars.FINNHUB_KEY }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT || vars.SEC_USER_AGENT }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN || vars.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || vars.TELEGRAM_CHAT_ID }}
           MONEYFLOW_DB_PATH: data/moneyflow.duckdb
-        run: uv run moneyflow -v run --date today --telegram
+        run: |
+          for k in ANTHROPIC_API_KEY TELEGRAM_TOKEN TELEGRAM_CHAT_ID FINNHUB_KEY SEC_USER_AGENT; do
+            if [ -z "${!k}" ]; then echo "::warning::$k trống — kiểm tra Settings → Secrets and variables → Actions"; fi
+          done
+          uv run moneyflow -v run --date today --telegram
 
       - uses: actions/upload-artifact@v4
         with:
